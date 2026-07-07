@@ -1,6 +1,5 @@
 package mate.academy.dao.impl;
 
-import jakarta.persistence.Query;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +10,7 @@ import mate.academy.model.MovieSession;
 import mate.academy.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 @Dao
 public class MovieSessionDaoImpl implements MovieSessionDao {
@@ -43,18 +43,22 @@ public class MovieSessionDaoImpl implements MovieSessionDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new DataProcessingException("Can not get MovieSession from a DB", e);
+            throw new DataProcessingException("Can not get MovieSession from a DB by id: " + id, e);
         }
     }
 
     @Override
     public List<MovieSession> findAvailableSessions(Long movieId, LocalDate date) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query getAllMoviesQuery = session.createQuery(
-                    "from MovieSession ms where ms.showTime >= :date", MovieSession.class);
+            Query<MovieSession> getAllMoviesQuery = session.createQuery(
+                    "from MovieSession ms "
+                            + "where ms.movie.id = :movieId "
+                            + "and ms.showTime >= :date",
+                    MovieSession.class);
+
+            getAllMoviesQuery.setParameter("movieId", movieId);
             getAllMoviesQuery.setParameter("date", date.atStartOfDay());
-            List<MovieSession> resultList = getAllMoviesQuery.getResultList();
-            return resultList;
+            return getAllMoviesQuery.getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("Can't get all available movies. ", e);
 

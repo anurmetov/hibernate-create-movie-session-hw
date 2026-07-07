@@ -44,7 +44,6 @@ public class Main {
         movieSessionService.findAvailableSessions(1L,
                 LocalDate.from(localDateTime)).forEach(System.out::println);
 
-
         CinemaHall cinemaHall = new CinemaHall();
         cinemaHall.setDescription("bla bla");
         CinemaHallService cinemaHallService =

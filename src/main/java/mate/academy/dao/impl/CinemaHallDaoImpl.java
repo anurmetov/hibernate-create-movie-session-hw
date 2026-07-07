@@ -1,6 +1,5 @@
 package mate.academy.dao.impl;
 
-import jakarta.persistence.Query;
 import java.util.List;
 import java.util.Optional;
 import mate.academy.dao.CinemaHallDao;
@@ -10,6 +9,7 @@ import mate.academy.model.CinemaHall;
 import mate.academy.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 @Dao
 public class CinemaHallDaoImpl implements CinemaHallDao {
@@ -43,16 +43,16 @@ public class CinemaHallDaoImpl implements CinemaHallDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new DataProcessingException("Can not add CinemaHall to a DB", e);
+            throw new DataProcessingException("Can not get CinemaHall from a DB by id: " + id, e);
         }
     }
 
     @Override
     public List<CinemaHall> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query getAllMoviesQuery = session.createQuery("from CinemaHall ", CinemaHall.class);
-            List<CinemaHall> resultList = getAllMoviesQuery.getResultList();
-            return resultList;
+            Query<CinemaHall> getAllMoviesQuery = session.createQuery(
+                    "from CinemaHall ", CinemaHall.class);
+            return getAllMoviesQuery.getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("Can't get all Cinema Halls. ", e);
 
