@@ -3,6 +3,7 @@ package mate.academy.dao.impl;
 import jakarta.persistence.Query;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import mate.academy.dao.MovieSessionDao;
 import mate.academy.exception.DataProcessingException;
 import mate.academy.lib.Dao;
@@ -30,14 +31,14 @@ public class MovieSessionDaoImpl implements MovieSessionDao {
     }
 
     @Override
-    public MovieSession get(Long id) {
+    public Optional<MovieSession> get(Long id) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.getTransaction();
             transaction.begin();
             MovieSession foundedMovieSession = session.get(MovieSession.class, id);
             transaction.commit();
-            return foundedMovieSession;
+            return Optional.ofNullable(foundedMovieSession);
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
