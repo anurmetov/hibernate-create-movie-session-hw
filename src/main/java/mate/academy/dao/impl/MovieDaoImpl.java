@@ -3,7 +3,6 @@ package mate.academy.dao.impl;
 import jakarta.persistence.Query;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import mate.academy.dao.MovieDao;
 import mate.academy.exception.DataProcessingException;
 import mate.academy.lib.Dao;
