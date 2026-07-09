@@ -17,7 +17,9 @@ public class MovieSessionDaoImpl implements MovieSessionDao {
     @Override
     public MovieSession add(MovieSession movieSession) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             session.persist(movieSession);
             transaction.commit();
@@ -27,22 +29,19 @@ public class MovieSessionDaoImpl implements MovieSessionDao {
                 transaction.rollback();
             }
             throw new DataProcessingException("Can't insert movieSession " + movieSession, e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
     @Override
     public Optional<MovieSession> get(Long id) {
-        Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.getTransaction();
-            transaction.begin();
             MovieSession foundedMovieSession = session.get(MovieSession.class, id);
-            transaction.commit();
             return Optional.ofNullable(foundedMovieSession);
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             throw new DataProcessingException("Can not get MovieSession from a DB by id: " + id, e);
         }
     }
